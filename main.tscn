@@ -1,10 +1,103 @@
-[gd_scene load_steps=2 format=3 uid="uid://cc24u4627nwdm"]
+[gd_scene load_steps=6 format=3 uid="uid://cc24u4627nwdm"]
 
 [ext_resource type="PackedScene" uid="uid://djopfiuy631uk" path="res://robot.tscn" id="1_1m7rm"]
+[ext_resource type="Script" path="res://main.gd" id="1_223oh"]
+[ext_resource type="PackedScene" uid="uid://clufabty8unca" path="res://box.tscn" id="2_ysi3p"]
+[ext_resource type="PackedScene" uid="uid://ch4ud0i0earfb" path="res://goal.tscn" id="4_mta1l"]
 
-[node name="Node2D" type="Node2D"]
+[sub_resource type="GDScript" id="GDScript_c2lcr"]
+script/source = "extends StaticBody2D
+class_name Box
+"
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_223oh")
+
+[node name="Goal" parent="." instance=ExtResource("4_mta1l")]
+position = Vector2(900, 500)
 
 [node name="Robot" parent="." instance=ExtResource("1_1m7rm")]
-position = Vector2(546, 365)
-sample_count = 5
-acceleration_max = 10.0
+position = Vector2(100, 500)
+scale = Vector2(0.05, 0.0494719)
+sensor_count = 24
+heading_weight = 0.8
+distance_weight = 0.1
+velocity_weight = 0.1
+sample_count = 10
+acceleration_max = 50.0
+deceleration_max = 100.0
+velocity_max = 50.0
+angular_acceleration_max = 3.142
+angular_deceleration_max = 6.283
+angular_velocity_max = 3.142
+velocity_safety = 0.4
+
+[node name="Box" parent="." instance=ExtResource("2_ysi3p")]
+position = Vector2(-50, 500)
+scale = Vector2(1, 50)
+script = SubResource("GDScript_c2lcr")
+
+[node name="Box11" parent="." instance=ExtResource("2_ysi3p")]
+position = Vector2(1050, 500)
+scale = Vector2(1, 50)
+script = SubResource("GDScript_c2lcr")
+
+[node name="Box7" parent="." instance=ExtResource("2_ysi3p")]
+position = Vector2(500, -50)
+scale = Vector2(50, 1)
+script = SubResource("GDScript_c2lcr")
+
+[node name="Box8" parent="." instance=ExtResource("2_ysi3p")]
+position = Vector2(500, 1050)
+scale = Vector2(50, 1)
+script = SubResource("GDScript_c2lcr")
+
+[node name="Box5" parent="." instance=ExtResource("2_ysi3p")]
+position = Vector2(80, 680)
+scale = Vector2(4, 0.7)
+script = SubResource("GDScript_c2lcr")
+
+[node name="Box3" parent="." instance=ExtResource("2_ysi3p")]
+position = Vector2(80, 320)
+scale = Vector2(4, 0.7)
+script = SubResource("GDScript_c2lcr")
+
+[node name="Box2" parent="." instance=ExtResource("2_ysi3p")]
+position = Vector2(920, 680)
+scale = Vector2(4, 0.7)
+script = SubResource("GDScript_c2lcr")
+
+[node name="Box9" parent="." instance=ExtResource("2_ysi3p")]
+position = Vector2(500, 680)
+scale = Vector2(2, 0.7)
+script = SubResource("GDScript_c2lcr")
+
+[node name="Box12" parent="." instance=ExtResource("2_ysi3p")]
+position = Vector2(760, 980)
+scale = Vector2(0.7, 2.5)
+script = SubResource("GDScript_c2lcr")
+
+[node name="Box13" parent="." instance=ExtResource("2_ysi3p")]
+position = Vector2(240, 980)
+scale = Vector2(0.7, 2.5)
+script = SubResource("GDScript_c2lcr")
+
+[node name="Box14" parent="." instance=ExtResource("2_ysi3p")]
+position = Vector2(760, 20)
+scale = Vector2(0.7, 2.5)
+script = SubResource("GDScript_c2lcr")
+
+[node name="Box15" parent="." instance=ExtResource("2_ysi3p")]
+position = Vector2(240, 20)
+scale = Vector2(0.7, 2.5)
+script = SubResource("GDScript_c2lcr")
+
+[node name="Box10" parent="." instance=ExtResource("2_ysi3p")]
+position = Vector2(500, 320)
+scale = Vector2(2, 0.7)
+script = SubResource("GDScript_c2lcr")
+
+[node name="Box4" parent="." instance=ExtResource("2_ysi3p")]
+position = Vector2(920, 320)
+scale = Vector2(4, 0.7)
+script = SubResource("GDScript_c2lcr")

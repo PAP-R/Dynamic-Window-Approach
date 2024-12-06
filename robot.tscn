@@ -1,41 +1,32 @@
-[gd_scene load_steps=6 format=3 uid="uid://djopfiuy631uk"]
+[gd_scene load_steps=5 format=3 uid="uid://djopfiuy631uk"]
 
 [ext_resource type="Script" path="res://robot.gd" id="1_o54ik"]
-[ext_resource type="Texture2D" uid="uid://cv3cs27kn0tf0" path="res://icon.svg" id="2_iaq7x"]
+[ext_resource type="Texture2D" uid="uid://ck7ci15db0yy" path="res://Trianglething.svg" id="2_bhclk"]
 
-[sub_resource type="Gradient" id="Gradient_57cgf"]
-interpolation_mode = 2
-offsets = PackedFloat32Array(0.675, 0.7)
-colors = PackedColorArray(0, 0, 0, 1, 1, 1, 1, 0)
-metadata/_snap_count = 40
-metadata/_snap_enabled = true
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_56b7n"]
-gradient = SubResource("Gradient_57cgf")
-width = 512
-height = 512
-fill = 1
-fill_from = Vector2(0.5, 0.5)
+[sub_resource type="ArrayMesh" id="ArrayMesh_clist"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ww7of"]
-radius = 256.0
 
 [node name="Robot" type="CharacterBody2D"]
+position = Vector2(1, 0)
 script = ExtResource("1_o54ik")
-
-[node name="Circle" type="Sprite2D" parent="."]
-texture = SubResource("GradientTexture2D_56b7n")
-
-[node name="Arrow" type="Sprite2D" parent="Circle"]
-rotation = 1.57079
-scale = Vector2(2.53125, 2.53125)
-texture = ExtResource("2_iaq7x")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_ww7of")
+acceleration_max = 10.0
+deceleration_max = 20.0
+angular_acceleration_max = 10.0
 
 [node name="Timer" type="Timer" parent="."]
 process_callback = 0
 autostart = true
+
+[node name="Arrow" type="Sprite2D" parent="."]
+rotation = 1.57079
+texture = ExtResource("2_bhclk")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="."]
+top_level = true
+mesh = SubResource("ArrayMesh_clist")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_ww7of")
 
 [connection signal="timeout" from="Timer" to="." method="dwa"]
