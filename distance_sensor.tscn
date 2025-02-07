@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://f550cwyr8gkm"]
+
+[ext_resource type="Script" path="res://distance_sensor.gd" id="1_l7tby"]
+
+[sub_resource type="Gradient" id="Gradient_34722"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_7qg12"]
+gradient = SubResource("Gradient_34722")
+width = 1
+height = 1
+
+[node name="DistanceSensor" type="RayCast2D"]
+target_position = Vector2(0, 500)
+script = ExtResource("1_l7tby")
+
+[node name="Line" type="Sprite2D" parent="."]
+visibility_layer = 3
+scale = Vector2(10, 10)
+texture = SubResource("GradientTexture2D_7qg12")

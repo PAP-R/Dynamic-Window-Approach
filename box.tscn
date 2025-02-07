@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3 uid="uid://clufabty8unca"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_21bvm"]
+size = Vector2(100, 100)
+
+[sub_resource type="Gradient" id="Gradient_761qf"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.824675, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_tnhrn"]
+gradient = SubResource("Gradient_761qf")
+width = 100
+height = 100
+fill = 2
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0, 0)
+
+[node name="Box" type="StaticBody2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_21bvm")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("GradientTexture2D_tnhrn")
