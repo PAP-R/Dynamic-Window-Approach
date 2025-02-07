@@ -11,6 +11,8 @@ class_name Robot
 
 @export var interval: float = 0.25
 
+@export var prediction_interval: float = 0.05
+
 @export var acceleration_max: float = 1
 @export var deceleration_max: float = 1
 @export var velocity_max: float = 90
@@ -184,7 +186,25 @@ func linear_to_2d(x: float) -> Vector2:
 	
 	
 func get_future_position(v: float, w: float) -> Vector2:
+	#var pos = global_position
+#
+	#if v == 0:
+		#return pos
+#
+	#var t = 0
+#
+	#if w == 0:
+		#while t < interval:
+			#pos += v * Vector2(cos(rotation) * interval, sin(rotation) * interval)
+			#t += prediction_interval
+		#
+	#else:
+		#while t < interval:
+			#pos += (v / w) * Vector2(cos(rotation) - cos(rotation + w * t), sin(rotation) - sin(rotation + w * t)) * prediction_interval
+			#t += prediction_interval
 	return global_position + (Vector2(cos(rotation), sin(rotation)) + Vector2(cos(rotation + w), sin(rotation + w))) / 2 * v
+
+	#return pos
 
 
 func get_future_rotation(w: float) -> float:
