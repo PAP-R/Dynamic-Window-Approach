@@ -71,52 +71,112 @@ func _ready() -> void:
 		sensors.append(s)
 
 
-func heading_rating(v: float, w: float) -> float:
-	var diff = goal - get_future_position(v, w)
-	#return (Vector2(cos(get_future_rotation(w)), sin(get_future_rotation(w))).dot(diff.normalized()) + 1) / 2
+func heading_rating(points) -> Array[float]:
+	var result: Array[float] = []
+	var min_result = INF
+	var max_result = -INF
+
+	for p in points:
+		var diff = goal - get_future_position(p[0], p[1])
+		var r = PI - fmod(abs(diff.angle() - get_future_rotation(p[1])), PI * 2)
+
+		result.append(r)
+		if r < min_result:
+			min_result = r
+		if r > max_result:
+			max_result = r
+
+	min_result /= max_result
+	for i in range(result.size()):
+		result[i] = result[i] / max_result - min_result
 	
-	return PI - fmod(abs(diff.angle() - get_future_rotation(w)), PI * 2)
+	return result
 
 
-func distance_rating(v: float, w: float) -> float:
+func distance_rating(points) -> Array[float]:
+	var result: Array[float] = []
+
 	if collision_points.is_empty():
-		return sensor_length
+		result.resize(points.size())
+		result.fill(1)
+		return result
+
+	var min_result = INF
+	var max_result = -INF
 		
-	var future_position = get_future_position(v, w)
+	for p in points:
+		var future_position = get_future_position(p[0], p[1])
 		
+		var distance_min = INF
+	
+		for c in collision_points:
+			var dist = future_position.distance_to(c) - (radius + p[0] * velocity_safety)
+			if dist < distance_min:
+				distance_min = dist
 		
-	var distance_min = INF
-	
-	
-	for p in collision_points:
-		var dist = future_position.distance_to(p) - (radius + v * velocity_safety)
-		if dist < distance_min:
-			distance_min = dist
-			
-	return distance_min
+		result.append(distance_min)
+		if distance_min < min_result:
+			min_result = distance_min
+		if distance_min > max_result:
+			max_result = distance_min
+		
 
-
-func velocity_rating(v: float, _w: float) -> float:
-	return v
-
-
-func smooth(x: float) -> float:
-	return x * x
-
-
-func rating(v, w) -> float:
-	var hr = heading_weight * heading_rating(v, w)
-	var dr = distance_weight * distance_rating(v, w) / sensor_length
-	var vr = velocity_weight * velocity_rating(v, w)
-	
-	arrays[Mesh.ARRAY_VERTEX].push_back(get_future_position(v, w))
-	arrays[Mesh.ARRAY_COLOR].push_back(Color(smooth(hr), smooth(dr), smooth(vr)))
-	
-	var result = smooth(hr + dr + vr)
-	
-	#print("rating(%f %f) = %f (h %f, d %f, v %f" % [v, w, result, hr, dr, vr])
+	min_result /= max_result
+	for i in range(result.size()):
+		result[i] = result[i] / max_result - min_result
 
 	return result
+
+
+func velocity_rating(points) -> Array[float]:
+	var result: Array[float] = []
+
+	var min_result = INF
+	var max_result = -INF
+
+	for p in points:
+		result.append(p[0])
+		if p[0] < min_result:
+			min_result = p[0]
+		if p[0] > max_result:
+			max_result = p[0]
+
+		
+	min_result /= max_result
+	for i in range(result.size()):
+		result[i] = result[i] / max_result - min_result
+
+	return result
+
+
+func rating(points) -> Array[float]:
+	var hrList = heading_rating(points)
+	var drList = distance_rating(points)
+	var vrList = velocity_rating(points)
+
+	var max_result = -INF
+	var max_v = 0
+	var max_w = 0
+
+
+	for i in range(points.size()):
+		#if not (points[i][0] <= sqrt(2 * drList[i] * deceleration_max) and points[i][1] <= sqrt(2 * drList[i] * angular_deceleration_max)):
+			#continue
+		
+		var hr = heading_weight * hrList[i]
+		var dr = distance_weight * drList[i]
+		var vr = velocity_weight * vrList[i]
+	
+		arrays[Mesh.ARRAY_VERTEX].push_back(get_future_position(points[i][0], points[i][1]))
+		arrays[Mesh.ARRAY_COLOR].push_back(Color(hrList[i], drList[i], vrList[i]))
+	
+		var result = hr + dr + vr
+		if result > max_result:
+			max_result = result
+			max_v = points[i][0]
+			max_w = points[i][1]
+
+	return Array([max_result, max_v, max_w], TYPE_FLOAT, "", null)
 
 
 func linear_to_2d(x: float) -> Vector2:
@@ -132,7 +192,6 @@ func get_future_rotation(w: float) -> float:
 
 
 func dwa():
-
 	mesh.clear_surfaces()
 
 	arrays[Mesh.ARRAY_VERTEX] = PackedVector2Array()
@@ -151,11 +210,6 @@ func dwa():
 
 	var v = velocity.length()
 	var w = angular_velocity
-
-	var max_v = 0
-	var max_w = 0
-	var max_rating = -INF
-
 
 	var linear_acceleration = (acceleration_max + deceleration_max) * interval
 	var angular_acceleration = (angular_acceleration_max + angular_deceleration_max) * interval
@@ -176,19 +230,19 @@ func dwa():
 	
 	var vt = linear_start
 	
+	var points = []
+	
 	while vt <= linear_end:
 		var wt = angular_start
 		while wt <= angular_end:
-			if vt <= sqrt(2 * distance_rating(vt, wt) * deceleration_max) and wt <= sqrt(2 * distance_rating(vt, wt) * angular_deceleration_max):
-				var result = rating(vt, wt)
-
-				if result > max_rating:
-					max_rating = result
-					max_v = vt
-					max_w = wt
+			points.append([vt, wt])
 			wt += angular_step_size
 		vt += linear_step_size
 		
+	var result = rating(points)
+	var max_rating = result[0]
+	var max_v = result[1]
+	var max_w = result[2]
 
 	if max_rating == -INF or max_v == 0:
 		var mean = Vector2(0, 0)
